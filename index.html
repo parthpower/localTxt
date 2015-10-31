@@ -1,0 +1,26 @@
+<html manifest="local.appcache">
+    <head>
+        <script src="main.js"></script>
+    </head>
+    <form onsubmit="false">
+        <table>
+            <tr>
+                <td>
+                    <textarea rows="10" cols="30" id="txt"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" id="save" value="save">
+                </td>
+                <td>
+                    <input type="button" id="clear" onclick="clearLocal();" value="clear" disabled>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <table id="dataDiv">
+
+    </table>
+</html>
