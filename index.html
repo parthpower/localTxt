@@ -1,8 +1,12 @@
 <html manifest="local.appcache">
     <head>
+        <title>localTxt</title>
         <script src="main.js"></script>
+        <link href="style.css" rel="stylesheet">
+        <meta name="viewport" content="width=320, initial-scale=1">
     </head>
-    <form onsubmit="false">
+    <body style="width: 320px">
+        <div style=font-size:10>Made with Love by <i><a href=https://twitter.com/parthpower>Parth Parikh</a></i></div>
         <table>
             <tr>
                 <td>
@@ -12,15 +16,12 @@
             <tr>
                 <td>
                     <input type="button" id="save" value="save">
-                </td>
-                <td>
-                    <input type="button" id="clear" onclick="clearLocal();" value="clear" disabled>
+
+                    <input type="button" id="clear" onclick="clearLocal();" value="clear">
                 </td>
             </tr>
         </table>
-    </form>
-
-    <table id="dataDiv">
-
-    </table>
+        <table id="dataDiv">
+        </table>
+    </body>
 </html>

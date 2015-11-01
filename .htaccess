@@ -1,0 +1,8 @@
+AddType text/cache-manifest .appcache
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresDefault A604800
+
+ExpiresByType text/x-javascript A604800
+ExpiresByType image/x-icon "access 1 year"
+</IfModule>
