@@ -1,7 +1,7 @@
 //Globals
 var data;
 var key = 0;
-
+var confirmClear = false;
 function CopyToClipboard(text) {
     var textArea = document.createElement("textarea");
     textArea.style.position = 'fixed';
@@ -16,18 +16,25 @@ function CopyToClipboard(text) {
     textArea.style.background = 'transparent';
     textArea.value = text;
     document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
+    try {
+        textArea.select();
+        document.execCommand('copy');
+    } catch (e) {
+
+    }
     document.body.removeChild(textArea);
-
 }
-
 function CopyToClipboardFromKey(id) {
     CopyToClipboard(decodeTxt(getData(id, data)["val"]));
     return false;
 }
+
 function updateClear() {
-    document.getElementById("clear").disabled = !(data.length > 0);
+    if (data.length > 0) {
+        document.getElementById("clear").style.visibility = "visible";
+    } else {
+        document.getElementById("clear").style.visibility = "hidden";
+    }
 }
 
 function storageAvailable(type) {
@@ -46,14 +53,17 @@ function storageAvailable(type) {
 function getTxt() {
     return encodeTxt(document.getElementById("txt").value);
 }
-
+function clearTxt() {
+    document.getElementById("txt").value = "";
+    document.getElementById("txt").focus();
+}
 function encodeTxt(txt) {
     var encoded = encodeURIComponent(txt);
     return encoded;
 }
 function decodeTxt(txt) {
     var decoded = decodeURIComponent(txt);
-    decoded = decoded.replace(/\x20/g, '\u00A0');
+    //decoded = decoded.replace(/\x20/g, '\u00A0');
     return decoded;
 }
 
@@ -61,6 +71,7 @@ function setStorage(dataArray) {
     updateClear();
     localStorage.setItem("#data", JSON.stringify(dataArray));
 }
+
 function getStorage() {
     return JSON.parse(localStorage.getItem("#data"));
 }
@@ -90,8 +101,9 @@ function getData(key, dataArray) {
 
 function delData(key, dataArray) {
     for (i = 0; i < dataArray.length; i++) {
-        if (dataArray[i]["key"] === parseInt(key)) {
-            dataArray.pop(i);
+        if (dataArray[i]["key"] === key) {
+            dataArray.splice(i,1);
+            break;
         }
     }
     setStorage(dataArray);
@@ -100,8 +112,8 @@ function delData(key, dataArray) {
 function getLastKey(dataArray) {
     var max = 0;
     for (i = 0; i < dataArray.length; i++) {
-        if (parseInt(dataArray[i]["key"]) > max)
-            max = parseInt(dataArray[i]["key"]);
+        if (dataArray[i]["key"] > max)
+            max = dataArray[i]["key"];
     }
     return max;
 }
@@ -111,20 +123,22 @@ function getNewKey() {
 }
 
 function writeData(val, key) {
-    var withCopy = "<tr class='dataField'><td><a href='#' onclick='return deleteClick(this);' name='" + key + "'>X</a></td><td><a href='#' onclick='return CopyToClipboardFromKey(" + key + ");'> Copy </a></td><td class='dataTd'  id='dataField" + key + "' onclick=editClick(this) name='" + key + "'></td></tr>";
+    var withCopy = "<tr class='dataField'><td class='delTd'><a href='#' onclick='return deleteClick(this);' name='" + key + "'>X</a></td><td class='copyTd'><a href='#' onclick='return CopyToClipboardFromKey(" + key + ");'> Copy </a></td><td class='qrTd'><a href='#' onclick='return getQRClick(event," + key + ");' id='qrclick" + key + "'> QR </a></td><td class='dataTd'  id='dataField" + key + "' onclick=editClick(event) name='" + key + "'></td></tr>";
     document.getElementById("dataDiv").innerHTML += withCopy;
     var field = document.getElementById("dataField" + key);
     field.textContent = decodeTxt(val);
     field.innerHTML = field.innerHTML.replace(/\n\r?/g, "<br />");
 }
 
-function editClick(field) {
+function editClick(e) {
+    var field = e.target;
+    if (field.classList.contains("dataTd")) {
         var key = field.getAttribute('name');
         var editBox = document.createElement("textarea");
         editBox.style.height = (field.clientHeight + 10) + "px";
-        editBox.style.width = (field.clientWidth + 10) + "px";
+        editBox.style.width = (field.clientWidth + 50) + "px";
         field.innerHTML = "";
-        field.parentElement.appendChild(editBox);
+        field.appendChild(editBox);
         editBox.focus();
         editBox.value = decodeTxt(getData(key, data)["val"]);
         editBox.onblur = function () {
@@ -132,13 +146,36 @@ function editClick(field) {
             setStorage(data);
             field.textContent = decodeTxt(getData(key, data)["val"]);
             field.innerHTML = field.innerHTML.replace(/\n\r?/g, "<br />");
-            field.parentElement.removeChild(editBox);
             editBox.remove();
         };
+    }
+}
+
+function getQRClick(e, key) {
+    handle = e.target;
+
+    if (handle === document.getElementById("qrclick" + key)) {
+        if (handle.childElementCount === 0) {
+            handle.textContent = "";
+            dataString = decodeTxt(getData(key, data)["val"]);
+            //var sz = getQRSize(dataString.length);
+            var qrDiv = qr.image({value: dataString,
+                size: 10,
+                foreground:"#006666"
+            });
+            //var qrDiv = qr.image(dataString);
+            qrDiv.setAttribute("id", "qr" + key);
+            handle.appendChild(qrDiv);
+        }
+    } else if (handle === document.getElementById("qr" + key)) {
+        handle.parentElement.textContent = "QR";
+        handle.remove();
+    }
+    return false;
 }
 
 function deleteClick(handle) {
-    delData(handle.name, data);
+    delData(parseInt(handle.name), data);
     h = handle;
     while (h.getAttribute('class') !== "dataField") {
         h = h.parentElement;
@@ -157,33 +194,47 @@ function clearLocal() {
 }
 
 window.onload = function () {
+    document.getElementById("heading").onclick = function () {
+        document.getElementById("descriptionBox").hidden = !document.getElementById("descriptionBox").hidden;
+        return false;
+    };
 
-    if (!storageAvailable('localStorage')) {
-        window.innerHTML = "Sorry, you're browser don't support localStorage";
-    }
-    else {
-        data = getStorage();
-        if (data === null) {
-            data = [];
-        } else {
-            key = getLastKey(data);
-            for (i = 0; i < data.length; i++) {
-                writeData(data[i]["val"], data[i]["key"]);
-            }
+    data = getStorage();
+    if (data === null) {
+        data = [];
+    } else {
+        document.getElementById("descriptionBox").hidden = true;
+        key = getLastKey(data);
+        for (i = 0; i < data.length; i++) {
+            writeData(data[i]["val"], data[i]["key"]);
         }
-        updateClear();
-        document.getElementById("save").onclick = function () {
-            currentData = getTxt();
-            if (currentData.length > 0) {
-                currentKey = getNewKey();
-                saveData(currentData, currentKey, data);
-                setStorage(data);
-                writeData(currentData, currentKey);
-            }
-            document.getElementById("txt").focus();
-            document.getElementById("txt").value = '';
-        };
     }
+    document.getElementById("clear").onclick = function () {
+        if (confirmClear) {
+            document.getElementById("clear").value = "ClearAllNotes";
+            clearLocal();
+            confirmClear = !confirmClear;
+        } else {
+            document.getElementById("clear").value = "Confirm";
+            confirmClear = !confirmClear;
+        }
+    };
+    updateClear();
+    document.getElementById("save").onclick = function () {
+        currentData = getTxt();
+        if (currentData.length > 0) {
+            currentKey = getNewKey();
+            saveData(currentData, currentKey, data);
+            setStorage(data);
+            writeData(currentData, currentKey);
+        }
+        document.getElementById("txt").focus();
+        document.getElementById("txt").value = '';
+    };
+    document.getElementById("txt").onfocus = function(){
+        document.getElementById("descriptionBox").hidden =true;
+    };
+
 };
 
 window.addEventListener('storage', function () {

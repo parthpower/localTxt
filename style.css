@@ -2,3 +2,33 @@
     max-width: 200px;
     word-wrap: break-word;
 }
+#heading a{
+    font-size: 20px;
+    color: #666666;
+    text-decoration:none;
+}
+
+#description{
+    color:initial;
+    font-size: 13px;
+    max-width: 250px;
+    word-wrap: break-word;
+}
+
+#credit{
+    font-size: 10px;
+    color:initial;
+}
+.delTd a:link{
+    color: #660000;
+    text-decoration: none;
+}
+
+.copyTd a:link{
+    color:  #cccc00;
+    text-decoration: none;
+}
+.qrTd a{
+    color:#009999;
+    text-decoration: none;
+}

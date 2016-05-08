@@ -1,27 +1,46 @@
-<html manifest="local.appcache">
-    <head>
-        <title>localTxt</title>
-        <script src="main.js"></script>
-        <link href="style.css" rel="stylesheet">
-        <meta name="viewport" content="width=320, initial-scale=1">
-    </head>
-    <body style="width: 320px">
-        <div style=font-size:10>Made with Love by <i><a href=https://twitter.com/parthpower>Parth Parikh</a></i></div>
+<!-- 
+localTxt http://localtxt.orionsysllc.com
+Copyright (C) 2015  Parth Parikh
+Freely distributable under the MIT license.
+-->
+<!---Used Libs: [qr.js](http://neocotic.com/qr.js) 1.0.3// (c) 2011 Alasdair Mercer// Freely distributable under the MIT license.// Based on jsqrencode// (c) 2010 tz@execpc.com// Licensed under the GPL Version 3 license.-->
+
+<html manifest=local.appcache>
+
+<head>
+    <title>localTxt</title>
+	<script src="main.js"></script>
+	<script src="qr.min.js"></script>
+	<link href="style.css" rel="stylesheet">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <body style=width:320px>
+        <div id=heading><a href=#>Local Txt <\click me></a></div>
+        <div id=descriptionBox>
+            <div id=description>This is an extremely light weight yet "cool" featured note taking WebApp.
+                <ul>
+                    <li>Simply write anything and hit Save to note.</li>
+                    <li>No usernames, No passwords, No accounts. Everything is stored in your browser, and it will remain there even if you refresh the page.</li>
+                    <li>Load it just once, works offline</li>
+                    <li>Usage:
+                        <ul>
+                            <li>Click Text to edit, click somewhere else to save changes</li>
+                            <li class=delTd>X->Delete</li>
+                            <li>Copy->CopyToClipboard (doesn't support all browsers)</li>
+                            <li>QR-> Generate QR Code</li>
+                        </ul>
+                    </li>
+                </ul><a href=about.html>About</a> Page
+                <br>(Try <a href=https://www.the-qrcode-generator.com/scan>this</a> webapp to scan QR codes)</div>
+            <div id=credit>Made with Love by <i><a href=https://plus.google.com/u/0/+ParthParikh01>Parth Parikh</a></i></div>
+        </div>
         <table>
             <tr>
                 <td>
-                    <textarea rows="10" cols="30" id="txt"></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" id="save" value="save">
-
-                    <input type="button" id="clear" onclick="clearLocal();" value="clear">
-                </td>
-            </tr>
+                    <textarea rows=7 cols=30 id=txt placeholder="Write something .... "></textarea>
+                    <tr>
+                        <td>
+                            <input type=button id=save value=Save>
+                            <input type=button id=clearTxt value=ClearTextArea onclick=clearTxt()>
+                            <input type=button id=clear value=ClearAllNotes>
         </table>
-        <table id="dataDiv">
-        </table>
-    </body>
-</html>
+        <table id=dataDiv></table>
